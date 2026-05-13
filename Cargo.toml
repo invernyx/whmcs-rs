@@ -3,6 +3,12 @@ name = "whmcs"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
+description = "Rust client for the WHMCS API"
+authors = ["TFDI Design Co."]
+repository = "https://github.com/invernyx/whmcs-rs"
+keywords = ["whmcs", "api", "client"]
+categories = ["networking", "web"]
+readme = "README.md"
 
 [dependencies.tokio]
 version = "1.52.3"
