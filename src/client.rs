@@ -88,7 +88,7 @@ impl WhmcsClient {
             request_body = serde_json::Value::Object(Map::new());
         }
         if let Some(obj) = request_body.as_object_mut() {
-            obj.insert("action".to_string(), action.to_lowercase().into());
+            obj.insert("action".to_string(), action.into());
             obj.insert("identifier".to_string(), self.api_identifier.clone().into());
             obj.insert("secret".to_string(), self.api_secret.clone().into());
             obj.insert("responsetype".to_string(), "json".into());
