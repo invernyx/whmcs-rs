@@ -192,7 +192,7 @@ mod tests {
         test::get_test_client,
     };
 
-    #[ignore]
+    #[ignore = "Require WHMCS instance"]
     #[tokio::test]
     async fn get_client_groups() {
         let client = get_test_client();
@@ -201,7 +201,7 @@ mod tests {
         assert_eq!(response.groups.len(), 0);
     }
 
-    #[ignore]
+    #[ignore = "Require WHMCS instance"]
     #[tokio::test]
     async fn invalid_get_client_password() {
         let client = get_test_client();
@@ -213,7 +213,7 @@ mod tests {
         assert!(matches!(err, WhmcsError::ApiError(_)));
     }
 
-    #[ignore]
+    #[ignore = "Require WHMCS instance"]
     #[tokio::test]
     async fn get_client_password() {
         let client = get_test_client();
@@ -225,7 +225,7 @@ mod tests {
         assert!(response.password.starts_with("$2y$"));
     }
 
-    #[ignore]
+    #[ignore = "Require WHMCS instance"]
     #[tokio::test]
     async fn get_clients() {
         let client = get_test_client();
@@ -238,7 +238,7 @@ mod tests {
         assert_eq!(response.clients[0].status, ClientStatus::Inactive);
     }
 
-    #[ignore]
+    #[ignore = "Require WHMCS instance"]
     #[tokio::test]
     async fn get_no_clients() {
         let client = get_test_client();
@@ -252,7 +252,7 @@ mod tests {
         assert_eq!(response.clients.len(), 0);
     }
 
-    #[ignore]
+    #[ignore = "Require WHMCS instance"]
     #[tokio::test]
     async fn get_single_client() {
         let client = get_test_client();
@@ -270,7 +270,7 @@ mod tests {
         assert_eq!(response.clients[0].email, email);
     }
 
-    #[ignore]
+    #[ignore = "Require WHMCS instance"]
     #[tokio::test]
     async fn get_client_details() {
         let client = get_test_client();

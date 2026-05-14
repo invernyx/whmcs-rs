@@ -55,7 +55,7 @@ mod tests {
         std::env::var("PASSWORD").expect("set PASSWORD for validate_login integration tests")
     }
 
-    #[ignore]
+    #[ignore = "Require WHMCS instance"]
     #[tokio::test]
     async fn validate_login_success() {
         let client = get_test_client();
@@ -75,7 +75,7 @@ mod tests {
         assert_ne!(response.user_id.as_u32(), 0);
     }
 
-    #[ignore]
+    #[ignore = "Require WHMCS instance"]
     #[tokio::test]
     async fn validate_login_wrong_password() {
         let client = get_test_client();
