@@ -1,77 +1,9 @@
-use std::time::Duration;
-
-use reqwest::header::CONTENT_TYPE;
-use serde_json::Map;
 use url::Url;
 
-use crate::{
-    error::{BuilderError, WhmcsError},
-    models::WhmcsRawResponse,
-};
-
-/// A client for the WHMCS API.
-pub struct WhmcsClient {
-    client: reqwest::Client,
-    url: Url,
-    api_identifier: String,
-    api_secret: String,
-    timeout: u64,
-}
-
-impl WhmcsClient {
-    /// Send a request to the WHMCS API
-    ///
-    /// This function takes an action (from the WHMCS API Index), the parameters (which must be serializable to JSON)
-    /// and the expected response type (which must be deserializable from JSON).
-    ///
-    /// It returns a `Result` containing the deserialized response or a `WhmcsError` if the request fails.
-    ///
-    /// # Errors
-    ///
-    /// - `WhmcsError::SerializationError` if the parameters cannot be serialized to JSON
-    /// - `WhmcsError::RequestError` if the request fails
-    /// - `WhmcsError::ApiError` if the API returns an error
-    pub async fn request<P, T>(&self, action: &str, params: P) -> Result<T, WhmcsError>
-    where
-        P: serde::Serialize,
-        T: serde::de::DeserializeOwned,
-    {
-        let mut request_body =
-            serde_json::to_value(params).map_err(WhmcsError::SerializationError)?;
-
-        if request_body.is_null() {
-            request_body = serde_json::Value::Object(Map::new());
-        }
-        if let Some(obj) = request_body.as_object_mut() {
-            obj.insert("action".to_string(), action.to_lowercase().into());
-            obj.insert("identifier".to_string(), self.api_identifier.clone().into());
-            obj.insert("secret".to_string(), self.api_secret.clone().into());
-            obj.insert("responsetype".to_string(), "json".into());
-        }
-
-        let response_text = self
-            .client
-            .post(self.url.as_str())
-            .header(CONTENT_TYPE, "application/x-www-form-urlencoded")
-            .form(&request_body)
-            .timeout(Duration::from_secs(self.timeout))
-            .send()
-            .await
-            .map_err(WhmcsError::RequestError)?
-            .text()
-            .await
-            .map_err(WhmcsError::RequestError)?;
-
-        match serde_json::from_str::<WhmcsRawResponse<T>>(&response_text)
-            .map_err(WhmcsError::SerializationError)?
-        {
-            WhmcsRawResponse::Success(data) => Ok(data),
-            WhmcsRawResponse::Error { message } => Err(WhmcsError::ApiError(message)),
-        }
-    }
-}
+use crate::{client::WhmcsClient, error::BuilderError};
 
 /// A builder for the WHMCS API client.
+#[derive(Debug)]
 pub struct WhmcsBuilder {
     url: Option<String>,
     api_identifier: Option<String>,
@@ -85,6 +17,7 @@ impl Default for WhmcsBuilder {
     }
 }
 
+#[cfg(feature = "builder")]
 impl WhmcsBuilder {
     /// Create a new builder for the WHMCS API client.
     #[must_use]
@@ -165,13 +98,7 @@ impl WhmcsBuilder {
                 .unwrap_or(30)
         });
 
-        Ok(WhmcsClient {
-            client: reqwest::Client::new(),
-            url,
-            api_identifier,
-            api_secret,
-            timeout,
-        })
+        Ok(WhmcsClient::new(url, api_identifier, api_secret, timeout))
     }
 }
 
