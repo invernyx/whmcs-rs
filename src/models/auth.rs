@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::{deserialize_whmcs_bool, users::UserId};
 
 #[derive(Debug, Serialize, Default)]
+/// Parameters for validating a login on [`validate_login`](crate::WhmcsClient::validate_login).
 pub struct ValidateLoginParams {
     /// User Email Address
     pub email: String,
@@ -12,11 +13,15 @@ pub struct ValidateLoginParams {
 }
 
 impl ValidateLoginParams {
+    /// User Email Address
+    #[must_use]
     pub fn email(mut self, email: impl Into<String>) -> Self {
         self.email = email.into();
         self
     }
 
+    /// Password to validate
+    #[must_use]
     pub fn password(mut self, password: impl Into<String>) -> Self {
         self.password = password.into();
         self
@@ -25,6 +30,7 @@ impl ValidateLoginParams {
 
 #[derive(Debug, Deserialize)]
 #[non_exhaustive]
+/// Response from [`validate_login`](crate::WhmcsClient::validate_login).
 pub struct ValidateLoginResponse {
     /// User ID
     #[serde(rename = "userid")]

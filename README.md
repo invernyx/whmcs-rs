@@ -12,8 +12,8 @@ whmcs = "0.1.0"
 ## Create a client
 
 ```rust
-use whmcs::builder::WhmcsBuilder;
-use whmcs::error::WhmcsError;
+use whmcs::::WhmcsBuilder;
+use whmcs::WhmcsError;
 
 async fn example() -> Result<(), WhmcsError> {
     let client = WhmcsBuilder::new()

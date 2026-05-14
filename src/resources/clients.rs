@@ -1,5 +1,5 @@
 use crate::{
-    builder::WhmcsClient,
+    client::WhmcsClient,
     error::WhmcsError,
     models::clients::{
         GetClientDetailsParams, GetClientDetailsResponse, GetClientGroupsResponse, GetClientParams,
@@ -12,7 +12,27 @@ impl WhmcsClient {
     endpoint!(
         /// Obtain a vector of client groups
         ///
-        /// Reference: https://developers.whmcs.com/api-reference/getclientgroups/
+        /// # Example
+        /// ```no_run
+        /// # use whmcs::{WhmcsBuilder, models::clients::GetClientGroupsResponse};
+        /// # async fn run() -> Result<(), whmcs::WhmcsError> {
+        /// let client = WhmcsBuilder::new()
+        ///     .url("https://example.com/includes/api.php")
+        ///     .api_identifier("id")
+        ///     .api_secret("secret")
+        ///     .build()
+        ///     .expect("Failed to build client");
+        ///
+        /// let response = client.get_client_groups().await;
+        /// # Ok(())
+        /// # }
+        /// ```
+        ///
+        /// # Reference
+        /// <https://developers.whmcs.com/api-reference/getclientgroups/>
+        ///
+        /// # Errors
+        /// Will return a [`WhmcsError`](`crate::WhmcsError`) if the API returns an error.
         get_client_groups,
         "GetClientGroups",
         GetClientGroupsResponse
@@ -21,7 +41,27 @@ impl WhmcsClient {
         #[deprecated(since = "0.1.0", note = "Deprecated in WHMCS 8.0.0")]
         /// Obtain the encrypted client password
         ///
-        /// Reference: https://developers.whmcs.com/api-reference/getclientpassword/
+        /// # Example
+        /// ```no_run
+        /// # use whmcs::{WhmcsBuilder, models::clients::GetClientPasswordParams};
+        /// # async fn run() -> Result<(), whmcs::WhmcsError> {
+        /// let client = WhmcsBuilder::new()
+        ///     .url("https://example.com/includes/api.php")
+        ///     .api_identifier("id")
+        ///     .api_secret("secret")
+        ///     .build()
+        ///     .expect("Failed to build client");
+        ///
+        /// let response = client.get_client_password(GetClientPasswordParams::default().client_id(1)).await;
+        /// # Ok(())
+        /// # }
+        /// ```
+        ///
+        /// # Reference
+        /// <https://developers.whmcs.com/api-reference/getclientpassword/>
+        ///
+        /// # Errors
+        /// Will return a [`WhmcsError`](`crate::WhmcsError`) if the API returns an error.
         get_client_password,
         "GetClientPassword",
         GetClientPasswordParams,
@@ -30,7 +70,60 @@ impl WhmcsClient {
     endpoint!(
         /// Obtain the Clients that match passed criteria
         ///
-        /// Reference: https://developers.whmcs.com/api-reference/getclients/
+        /// # Examples
+        /// ## Getting 25 clients
+        /// ```no_run
+        /// # use whmcs::{WhmcsBuilder, models::clients::GetClientParams};
+        /// # async fn run() -> Result<(), whmcs::WhmcsError> {
+        /// let client = WhmcsBuilder::new()
+        ///     .url("https://example.com/includes/api.php")
+        ///     .api_identifier("id")
+        ///     .api_secret("secret")
+        ///     .build()
+        ///     .expect("Failed to build client");
+        ///
+        /// let response = client.get_clients(None).await;
+        /// # Ok(())
+        /// # }
+        /// ```
+        ///
+        /// ## Getting clients via a search term
+        /// ```no_run
+        /// # use whmcs::{WhmcsBuilder, models::clients::GetClientParams};
+        /// # async fn run() -> Result<(), whmcs::WhmcsError> {
+        /// let client = WhmcsBuilder::new()
+        ///     .url("https://example.com/includes/api.php")
+        ///     .api_identifier("id")
+        ///     .api_secret("secret")
+        ///     .build()
+        ///     .expect("Failed to build client");
+        ///
+        /// let response = client.get_clients(GetClientParams::default().search("user@example.com")).await;
+        /// # Ok(())
+        /// # }
+        /// ```
+        ///
+        /// ## Filtering options
+        /// ```no_run
+        /// # use whmcs::{WhmcsSorting, WhmcsBuilder, models::clients::{GetClientParams, ClientStatus, ClientOrderBy}};
+        /// # async fn run() -> Result<(), whmcs::WhmcsError> {
+        /// let client = WhmcsBuilder::new()
+        ///     .url("https://example.com/includes/api.php")
+        ///     .api_identifier("id")
+        ///     .api_secret("secret")
+        ///     .build()
+        ///     .expect("Failed to build client");
+        ///
+        /// let response = client.get_clients(GetClientParams::default().search("user@example.com").limit_start(10).limit_num(25).sorting(WhmcsSorting::Descending).status(ClientStatus::Active).order_by(ClientOrderBy::Email)).await;
+        /// # Ok(())
+        /// # }
+        /// ```
+        ///
+        /// # Reference
+        /// <https://developers.whmcs.com/api-reference/getclients/>
+        ///
+        /// # Errors
+        /// Will return a [`WhmcsError`](`crate::WhmcsError`) if the API returns an error.
         get_clients,
         "GetClients",
         GetClientParams,
@@ -39,9 +132,48 @@ impl WhmcsClient {
     endpoint!(
         /// Obtain the Clients Details for a specific client
         ///
-        /// *Internal usage note:* this function returns the client information in the top level array. This information is deprecated and may be removed in a future version of WHMCS.
+        /// # Examples
+        /// ## Getting client details
+        /// ```no_run
+        /// # use whmcs::{WhmcsBuilder, models::clients::GetClientDetailsParams};
+        /// # async fn run() -> Result<(), whmcs::WhmcsError> {
+        /// let client = WhmcsBuilder::new()
+        ///     .url("https://example.com/includes/api.php")
+        ///     .api_identifier("id")
+        ///     .api_secret("secret")
+        ///     .build()
+        ///     .expect("Failed to build client");
         ///
-        /// Reference: https://developers.whmcs.com/api-reference/getclientsdetails/
+        /// let response = client.get_client_details(GetClientDetailsParams::default().email("user@example.com")).await;
+        /// # Ok(())
+        /// # }
+        /// ```
+        ///
+        /// ## Getting client details and statistics
+        /// ```no_run
+        /// # use whmcs::{WhmcsBuilder, models::clients::GetClientDetailsParams};
+        /// # async fn run() -> Result<(), whmcs::WhmcsError> {
+        /// let client = WhmcsBuilder::new()
+        ///     .url("https://example.com/includes/api.php")
+        ///     .api_identifier("id")
+        ///     .api_secret("secret")
+        ///     .build()
+        ///     .expect("Failed to build client");
+        ///
+        /// let response = client.get_client_details(GetClientDetailsParams::default().client_id(1).include_stats(true)).await;
+        /// if let Some(stats) = response.unwrap().stats {
+        ///     // ... do something with the stats
+        /// }
+        /// # Ok(())
+        /// # }
+        /// ```
+        ///
+        ///
+        /// # Reference
+        /// <https://developers.whmcs.com/api-reference/getclientsdetails/>
+        ///
+        /// # Errors
+        /// Will return a [`WhmcsError`](`crate::WhmcsError`) if the API returns an error.
         get_client_details,
         "GetClientsDetails",
         GetClientDetailsParams,

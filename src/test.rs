@@ -1,4 +1,4 @@
-use crate::builder::{WhmcsBuilder, WhmcsClient};
+use crate::{builder::WhmcsBuilder, client::WhmcsClient};
 
 pub fn get_test_client() -> WhmcsClient {
     dotenvy::dotenv().ok();

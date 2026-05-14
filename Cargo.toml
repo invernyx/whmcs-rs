@@ -1,6 +1,6 @@
 [package]
 name = "whmcs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 license = "MIT"
 description = "Rust client for the WHMCS API"
@@ -9,10 +9,6 @@ repository = "https://github.com/invernyx/whmcs-rs"
 keywords = ["whmcs", "api", "client"]
 categories = ["web-programming"]
 readme = "README.md"
-
-[dependencies.tokio]
-version = "1.52.3"
-features = ["macros"]
 
 [dependencies.url]
 version = "2.5.8"
@@ -34,8 +30,16 @@ version = "1.0.149"
 [dependencies.paste]
 version = "1.0.15"
 
+[dev-dependencies.tokio]
+version = "1.52.3"
+features = ["macros"]
+
 [dev-dependencies.dotenvy]
 version = "0.15.7"
 
 [dev-dependencies.temp-env]
 version = "0.3.6"
+
+[features]
+builder = []
+default = ["builder"]
