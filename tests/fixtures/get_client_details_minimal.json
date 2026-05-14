@@ -1,0 +1,68 @@
+{
+  "client": {
+    "client_id": 1,
+    "owner_user_id": 1,
+    "userid": 1,
+    "uuid": "00000000-0000-0000-0000-000000000001",
+    "firstname": "Jane",
+    "lastname": "Doe",
+    "fullname": "Jane Doe",
+    "companyname": "",
+    "email": "jane@example.com",
+    "address1": "1 Main St",
+    "address2": "",
+    "city": "City",
+    "fullstate": "State Full",
+    "state": "ST",
+    "postcode": "12345",
+    "countrycode": "US",
+    "country": "United States",
+    "phonenumber": "+1",
+    "tax_id": "",
+    "email_preferences": {
+      "general": "1",
+      "invoice": "0",
+      "support": "0",
+      "product": "0",
+      "domain": "0",
+      "affiliate": "0"
+    },
+    "statecode": "ST",
+    "countryname": "United States",
+    "phonecc": 1,
+    "phonenumberformatted": "+1",
+    "telephoneNumber": "",
+    "billingcid": 1,
+    "notes": "",
+    "currency": 1,
+    "defaultgateway": "",
+    "groupid": 0,
+    "status": "Active",
+    "credit": "0.00",
+    "taxexempt": false,
+    "latefeeoveride": false,
+    "overideduenotices": false,
+    "separateinvoices": false,
+    "disableautocc": false,
+    "emailoptout": false,
+    "marketing_emails_opt_in": false,
+    "overrideautoclose": false,
+    "allowSingleSignOn": true,
+    "email_verified": true,
+    "language": "english",
+    "isOptedInToMarketingEmails": false,
+    "lastlogin": "2020-01-01 00:00:00",
+    "currency_code": "USD",
+    "users": {
+      "user": [
+        {
+          "id": 1,
+          "name": "Jane Doe",
+          "email": "jane@example.com",
+          "is_owner": "1"
+        }
+      ]
+    }
+  },
+  "stats": null
+}

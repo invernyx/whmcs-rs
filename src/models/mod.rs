@@ -126,6 +126,15 @@ macro_rules! u32_id {
         }
     };
 }
+
+macro_rules! mod_export {
+    ($mod_name:ident) => {
+        mod $mod_name;
+        pub use $mod_name::*;
+    };
+}
+
+use mod_export;
 pub(crate) use u32_id;
 pub(crate) use whmcs_nested_vec;
 

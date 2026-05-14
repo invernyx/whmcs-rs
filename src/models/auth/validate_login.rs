@@ -53,23 +53,20 @@ mod tests {
     #[test]
     fn validate_login_params_serializes_password2() {
         let p = ValidateLoginParams::default()
-            .email("u@example.com")
+            .email("a@example.com")
             .password("secret");
         let v = serde_json::to_value(&p).unwrap();
-        assert_eq!(v["email"], "u@example.com");
+        assert_eq!(v["email"], "a@example.com");
         assert_eq!(v["password2"], "secret");
+        assert!(!v.as_object().unwrap().contains_key("password"));
     }
 
     #[test]
     fn validate_login_response_deserializes() {
-        let json = r#"{
-            "userid": 99,
-            "passwordhash": "abc",
-            "twoFactorEnabled": false
-        }"#;
-        let r: ValidateLoginResponse = serde_json::from_str(json).unwrap();
-        assert_eq!(r.user_id, UserId::new(99));
-        assert_eq!(r.session_token.as_deref(), Some("abc"));
-        assert!(!r.two_factor_enabled);
+        let j = r#"{"userid":7,"passwordhash":"tok","twoFactorEnabled":"1"}"#;
+        let r: ValidateLoginResponse = serde_json::from_str(j).unwrap();
+        assert_eq!(r.user_id.as_u32(), 7);
+        assert_eq!(r.session_token.as_deref(), Some("tok"));
+        assert!(r.two_factor_enabled);
     }
 }

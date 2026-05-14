@@ -1,139 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 use crate::models::{
-    WhmcsSorting, deserialize_whmcs_bool, u32_id, users::UserId, whmcs_nested_vec,
+    clients::{ClientGroupId, ClientId, ClientStatus},
+    deserialize_whmcs_bool,
+    users::UserId,
+    whmcs_nested_vec,
 };
-
-u32_id!(ClientGroupId);
-u32_id!(ClientId);
-
-#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Hash)]
-/// Represents the lifecycle status of a client.
-pub enum ClientStatus {
-    /// The client is active.
-    Active,
-    /// The client is inactive.
-    Inactive,
-    /// The client is closed.
-    Closed,
-}
-
-#[derive(Debug, Serialize, Clone, Copy)]
-#[serde(rename_all = "lowercase")]
-/// Represents the column to order by when retrieving clients.
-pub enum ClientOrderBy {
-    /// Ordering by client's unique ID number.
-    Id,
-    /// Ordering by client first name.
-    FirstName,
-    /// Ordering by client last name.
-    LastName,
-    /// Ordering by client company name.
-    CompanyName,
-    /// Ordering by client email address.
-    Email,
-    /// Ordering by client group ID.
-    GroupId,
-    /// Ordering by client creation date.
-    DateCreated,
-    /// Ordering by client status.
-    Status,
-}
-
-#[derive(Debug, Serialize, Default)]
-/// Parameters for filtering and sorting the clients on [`get_clients`](crate::WhmcsClient::get_clients).
-pub struct GetClientParams {
-    /// The offset for the returned log data (default: 0)
-    #[serde(rename = "limitstart", skip_serializing_if = "Option::is_none")]
-    pub limit_start: Option<u32>,
-    /// The number of records to return (default: 25)
-    #[serde(rename = "limitnum", skip_serializing_if = "Option::is_none")]
-    pub limit_num: Option<u32>,
-    /// The direction to sort the results. ASC or DESC. Default: ASC
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sorting: Option<WhmcsSorting>,
-    /// Optional desired Client Status. ‘Active’, ‘Inactive’, or ‘Closed’.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<ClientStatus>,
-    /// The search term to look for at the start of email, firstname, lastname, fullname or companyname
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub search: Option<String>,
-    /// The column to order by. id, firstname, lastname, companyname, email, groupid, datecreated, status
-    #[serde(rename = "orderby", skip_serializing_if = "Option::is_none")]
-    pub order_by: Option<ClientOrderBy>,
-}
-
-impl GetClientParams {
-    /// The offset for the returned log data (default: 0)
-    #[must_use]
-    pub const fn limit_start(mut self, limit_start: u32) -> Self {
-        self.limit_start = Some(limit_start);
-        self
-    }
-
-    /// The number of records to return (default: 25)
-    #[must_use]
-    pub const fn limit_num(mut self, limit_num: u32) -> Self {
-        self.limit_num = Some(limit_num);
-        self
-    }
-
-    /// The direction to sort the results. ASC or DESC. Default: ASC
-    #[must_use]
-    pub const fn sorting(mut self, sorting: WhmcsSorting) -> Self {
-        self.sorting = Some(sorting);
-        self
-    }
-
-    /// Optional desired Client Status. ‘Active’, ‘Inactive’, or ‘Closed’.
-    #[must_use]
-    pub const fn status(mut self, status: ClientStatus) -> Self {
-        self.status = Some(status);
-        self
-    }
-
-    /// The search term to look for at the start of email, firstname, lastname, fullname or companyname
-    #[must_use]
-    pub fn search(mut self, search: impl Into<String>) -> Self {
-        self.search = Some(search.into());
-        self
-    }
-
-    /// The column to order by. id, firstname, lastname, companyname, email, groupid, datecreated, status
-    #[must_use]
-    pub const fn order_by(mut self, order_by: ClientOrderBy) -> Self {
-        self.order_by = Some(order_by);
-        self
-    }
-}
-
-#[derive(Debug, Serialize, Default)]
-/// Parameters for obtaining the password for a client on [`get_client_password`](crate::WhmcsClient::get_client_password).
-pub struct GetClientPasswordParams {
-    /// The client ID to obtain the password for
-    // WHMCS uses `userid` for the client ID, but we use `client_id` for consistency.
-    #[serde(rename = "userid", skip_serializing_if = "Option::is_none")]
-    pub client_id: Option<ClientId>,
-    /// The email address to obtain the password for
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-}
-
-impl GetClientPasswordParams {
-    /// The userid to obtain the password for
-    #[must_use]
-    pub fn client_id(mut self, client_id: impl Into<ClientId>) -> Self {
-        self.client_id = Some(client_id.into());
-        self
-    }
-
-    /// The email address to obtain the password for
-    #[must_use]
-    pub fn email(mut self, email: impl Into<String>) -> Self {
-        self.email = Some(email.into());
-        self
-    }
-}
 
 #[derive(Debug, Serialize, Default)]
 /// Parameters for obtaining the details for a client on [`get_client_details`](crate::WhmcsClient::get_client_details).
@@ -170,60 +42,6 @@ impl GetClientDetailsParams {
         self.include_stats = Some(include_stats);
         self
     }
-}
-
-#[derive(Debug, Deserialize, Clone)]
-/// Represents a client group in WHMCS. Returned by [`get_client_groups`](crate::WhmcsClient::get_client_groups).
-pub struct ClientGroup {
-    /// The ID number of the client group.
-    pub id: ClientGroupId,
-    /// The name of the client group.
-    #[serde(rename = "groupname")]
-    pub name: String,
-    /// The color of the client group.
-    #[serde(rename = "groupcolor")]
-    pub color: u8,
-    /// The discount percentage for the client group.
-    #[serde(rename = "discountpercent")]
-    pub discount_percentage: f32,
-    /// Whether the client group is exempt from suspension term.
-    #[serde(rename = "susptermexempt")]
-    #[serde(deserialize_with = "deserialize_whmcs_bool")]
-    pub suspension_term_exempt: bool,
-    /// Whether the client group should have separate invoices.
-    #[serde(rename = "separateinvoices")]
-    #[serde(deserialize_with = "deserialize_whmcs_bool")]
-    pub separate_invoices: bool,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-#[non_exhaustive]
-/// Represents a client in WHMCS. Returned by [`get_clients`](crate::WhmcsClient::get_clients).
-pub struct Client {
-    /// A client's unique ID number.
-    pub id: ClientId,
-    /// A client's first name.
-    #[serde(rename = "firstname")]
-    pub first_name: String,
-    /// A client's last name.
-    #[serde(rename = "lastname")]
-    pub last_name: String,
-    /// A client's email address.
-    pub email: String,
-    /// The name of the company employing a client.
-    #[serde(rename = "companyname")]
-    pub company_name: String,
-    /// Initial creation of the client data.
-    ///
-    /// Note: If the user was created before WHMCS 6.0.0, this will be set to 0000-00-00 00:00:00
-    #[serde(rename = "datecreated")]
-    pub date_created: String,
-    /// The ID number of the group that a client belongs to.
-    #[serde(rename = "groupid")]
-    pub group_id: ClientGroupId,
-    /// A client's status, either [`ClientStatus::Active`], [`ClientStatus::Inactive`], or [`ClientStatus::Closed`].
-    #[serde(rename = "status")]
-    pub status: ClientStatus,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -406,6 +224,8 @@ pub struct ClientStats {
     pub is_affiliate: bool,
 }
 
+whmcs_nested_vec!(deserialize_client_users_nested, user, ClientUser);
+
 #[derive(Debug, Deserialize, Clone)]
 #[non_exhaustive]
 #[allow(clippy::struct_excessive_bools)]
@@ -558,53 +378,6 @@ pub struct ClientDetails {
     pub users: Vec<ClientUser>,
 }
 
-whmcs_nested_vec!(deserialize_client_groups_nested, groups, ClientGroup);
-whmcs_nested_vec!(deserialize_clients_nested, client, Client);
-whmcs_nested_vec!(deserialize_client_users_nested, user, ClientUser);
-
-#[derive(Debug, Deserialize)]
-#[non_exhaustive]
-/// Response from [`get_client_groups`](crate::WhmcsClient::get_client_groups).
-pub struct GetClientGroupsResponse {
-    /// The total number of results available
-    #[serde(rename = "totalresults")]
-    pub total_results: u32,
-    /// The client group entries returned
-    #[serde(default)]
-    #[serde(
-        rename = "groups",
-        deserialize_with = "deserialize_client_groups_nested"
-    )]
-    pub groups: Vec<ClientGroup>,
-}
-
-#[derive(Debug, Deserialize)]
-#[non_exhaustive]
-/// Response from [`get_client_password`](crate::WhmcsClient::get_client_password).
-pub struct GetClientPasswordResponse {
-    /// The encrypted password for the client
-    pub password: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[non_exhaustive]
-/// Response from [`get_clients`](crate::WhmcsClient::get_clients).
-pub struct GetClientsResponse {
-    /// The total number of results available
-    #[serde(rename = "totalresults")]
-    pub total_results: u32,
-    /// The starting number for the returned results
-    #[serde(rename = "startnumber")]
-    pub start_number: u32,
-    /// The number of results returned
-    #[serde(rename = "numreturned")]
-    pub number_returned: u32,
-    /// The client entries returned
-    #[serde(default)]
-    #[serde(rename = "clients", deserialize_with = "deserialize_clients_nested")]
-    pub clients: Vec<Client>,
-}
-
 #[derive(Debug, Deserialize)]
 #[non_exhaustive]
 /// Response from [`get_client_details`](crate::WhmcsClient::get_client_details).
@@ -616,79 +389,43 @@ pub struct GetClientDetailsResponse {
 }
 
 #[cfg(test)]
-mod clients_model_tests {
+mod tests {
     use super::*;
-
-    #[test]
-    fn get_clients_response_deserializes_nested_clients() {
-        let json = r#"{
-            "totalresults": 2,
-            "startnumber": 0,
-            "numreturned": 2,
-            "clients": {
-                "client": [
-                    {
-                        "id": 1,
-                        "firstname": "A",
-                        "lastname": "B",
-                        "email": "a@b.c",
-                        "companyname": "",
-                        "datecreated": "2020-01-01",
-                        "groupid": 0,
-                        "status": "Active"
-                    },
-                    {
-                        "id": 2,
-                        "firstname": "C",
-                        "lastname": "D",
-                        "email": "c@d.e",
-                        "companyname": "Co",
-                        "datecreated": "2020-01-02",
-                        "groupid": 1,
-                        "status": "Inactive"
-                    }
-                ]
-            }
-        }"#;
-        let r: GetClientsResponse = serde_json::from_str(json).unwrap();
-        assert_eq!(r.total_results, 2);
-        assert_eq!(r.number_returned, 2);
-        assert_eq!(r.clients.len(), 2);
-        assert_eq!(r.clients[0].email, "a@b.c");
-        assert_eq!(r.clients[1].status, ClientStatus::Inactive);
-    }
-
-    #[test]
-    fn get_client_params_serializes_expected_keys() {
-        let p = GetClientParams::default()
-            .search("needle")
-            .limit_start(10)
-            .limit_num(5)
-            .sorting(crate::models::WhmcsSorting::Descending)
-            .status(ClientStatus::Active)
-            .order_by(ClientOrderBy::Email);
-        let v = serde_json::to_value(&p).unwrap();
-        assert_eq!(v["search"], "needle");
-        assert_eq!(v["limitstart"], 10);
-        assert_eq!(v["limitnum"], 5);
-        assert_eq!(v["sorting"], "DESC");
-        assert_eq!(v["status"], "Active");
-        assert_eq!(v["orderby"], "email");
-    }
 
     #[test]
     fn get_client_details_params_serializes_clientid_and_stats() {
         let p = GetClientDetailsParams::default()
-            .client_id(ClientId::new(42))
+            .client_id(ClientId::new(9))
+            .email("c@d.e")
             .include_stats(true);
         let v = serde_json::to_value(&p).unwrap();
-        assert_eq!(v["clientid"], 42);
+        assert_eq!(v["clientid"], 9);
+        assert_eq!(v["email"], "c@d.e");
         assert_eq!(v["stats"], true);
-        assert!(v.get("email").is_none());
     }
 
     #[test]
-    fn client_id_new_and_from_u32() {
-        assert_eq!(ClientId::from(7_u32), ClientId::new(7));
+    fn email_preference_deserializes_string_bools() {
+        let j = r#"{"general":"1","invoice":"0","support":"true","product":"0","domain":"0","affiliate":"no"}"#;
+        let e: EmailPreference = serde_json::from_str(j).unwrap();
+        assert!(e.general);
+        assert!(!e.invoice);
+        assert!(e.support);
+        assert!(!e.affiliate);
+    }
+
+    #[test]
+    fn get_client_details_response_deserializes_from_fixture() {
+        let raw = include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/fixtures/get_client_details_minimal.json"
+        ));
+        let r: GetClientDetailsResponse = serde_json::from_str(raw).unwrap();
+        assert_eq!(r.client.client_id, ClientId::new(1));
+        assert_eq!(r.client.email, "jane@example.com");
+        assert_eq!(r.client.users.len(), 1);
+        assert_eq!(r.client.users[0].id.as_u32(), 1);
+        assert!(r.client.users[0].is_owner);
+        assert!(r.stats.is_none());
     }
 }
