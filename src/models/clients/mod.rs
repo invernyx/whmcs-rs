@@ -5,6 +5,7 @@ use crate::models::{mod_export, u32_id};
 u32_id!(ClientGroupId);
 u32_id!(ClientId);
 
+mod_export!(add_client);
 mod_export!(get_client);
 mod_export!(get_client_details);
 mod_export!(get_client_groups);

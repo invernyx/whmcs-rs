@@ -27,6 +27,9 @@ features = ["derive"]
 [dependencies.serde_json]
 version = "1.0.149"
 
+[dependencies.base64]
+version = "0.22.1"
+
 [dependencies.paste]
 version = "1.0.15"
 

@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use crate::models::{
+    Country,
     clients::{ClientGroupId, ClientId, ClientStatus},
     deserialize_whmcs_bool,
+    system::CurrencyId,
     users::UserId,
     whmcs_nested_vec,
 };
@@ -69,7 +71,7 @@ pub struct EmailPreference {
     pub affiliate: bool,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 /// Represents custom fields on a client.
 pub struct CustomField {
@@ -269,7 +271,7 @@ pub struct ClientDetails {
     pub postcode: String,
     /// The country code of the client's address.
     #[serde(rename = "countrycode")]
-    pub country_code: String,
+    pub country_code: Country,
     /// The country of the client's address.
     pub country: String,
     /// The phone number of the client.
@@ -300,8 +302,7 @@ pub struct ClientDetails {
     /// The notes of the client.
     pub notes: String,
     /// The currency of the client.
-    // TODO: Replace with currency ID
-    pub currency: u8,
+    pub currency: CurrencyId,
     /// The default gateway of the client.
     #[serde(rename = "defaultgateway")]
     pub default_gateway: String,

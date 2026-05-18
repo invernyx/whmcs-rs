@@ -2,14 +2,60 @@ use crate::{
     client::WhmcsClient,
     error::WhmcsError,
     models::clients::{
-        GetClientDetailsParams, GetClientDetailsResponse, GetClientGroupsResponse, GetClientParams,
-        GetClientPasswordParams, GetClientPasswordResponse, GetClientsResponse,
+        AddClientParams, AddClientResponse, GetClientDetailsParams, GetClientDetailsResponse,
+        GetClientGroupsResponse, GetClientParams, GetClientPasswordParams,
+        GetClientPasswordResponse, GetClientsResponse,
     },
-    resources::endpoint,
+    resources::{endpoint, endpoint_no_params},
 };
 
 impl WhmcsClient {
     endpoint!(
+        /// Adds a client
+        ///
+        /// # Examples
+        /// ```no_run
+        /// # use whmcs::{WhmcsBuilder, models::{Country, clients::AddClientParams}};
+        /// # async fn run() -> Result<(), whmcs::WhmcsError> {
+        /// let client = WhmcsBuilder::new()
+        ///     .url("https://example.com/includes/api.php")
+        ///     .api_identifier("id")
+        ///     .api_secret("secret")
+        ///     .build()
+        ///     .expect("Failed to build client");
+        ///
+        /// let response = client.add_client(AddClientParams::default()
+        ///     .first_name("John")
+        ///     .last_name("Doe")
+        ///     .email("john.doe@example.com")
+        ///     .password("password")
+        ///     .address1("123 Main St")
+        ///     .city("Anytown")
+        ///     .state("CA")
+        ///     .postcode("12345")
+        ///     .country(Country::UnitedStates)
+        ///     .phone_number("123-456-7890")
+        /// ).await;
+        ///
+        /// if let Ok(response) = response {
+        ///     println!("Client added: {}", response.client_id.as_u32());
+        /// }
+        ///
+        /// # Ok(())
+        /// # }
+        /// ```
+        ///
+        /// # Reference
+        /// <https://developers.whmcs.com/api-reference/addclient/>
+        ///
+        /// # Errors
+        /// Will return a [`WhmcsError`](`crate::WhmcsError`) if the API returns an error.
+        add_client,
+        "AddClient",
+        AddClientParams,
+        AddClientResponse
+    );
+    endpoint_no_params!(
         /// Obtain a vector of client groups
         ///
         /// # Example
